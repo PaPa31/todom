@@ -1,4 +1,4 @@
-const liHeightLimit = 300;
+const liHeightLimit = 300; // Define the maximum height limit for sticky behavior
 let predictBottom = 100;
 let suspendTop = -200;
 let lastScrollTop = 0;
@@ -77,6 +77,7 @@ function handleLiScroll(event) {
     rect.top < suspendTop &&
     rect.bottom > predictBottom
   ) {
+    console.log("Turn On moment");
     if (!topInLi.classList.contains("sticky")) {
       console.log("Adding sticky class");
       addStickyClass();
@@ -84,6 +85,7 @@ function handleLiScroll(event) {
     handleScrollDirection();
   } else {
     // Turn Off moment
+    console.log("Turn Off moment");
     if (topInLi.classList.contains("sticky")) {
       console.log("Removing sticky class");
       removeClasses();
@@ -98,6 +100,7 @@ function handleLiScroll(event) {
     !belowHeightLimit
   ) {
     // Turn Off moment
+    console.log("Turn Off moment 2");
     if (topInLi.classList.contains("sticky")) {
       console.log("Forcing removal of sticky class");
       removeClasses();

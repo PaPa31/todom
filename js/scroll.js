@@ -1,6 +1,7 @@
 const liHeightLimit = 300;
 let predictBottom = 100;
 let suspendTop = -200;
+let lastScrollTop = 0;
 
 // Function to handle scroll events on a specific li element
 function handleLiScroll(event) {
@@ -17,6 +18,9 @@ function handleLiScroll(event) {
   const topVisible = rect.top >= 0 && rect.top <= window.innerHeight;
   const fullyVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
   const belowHeightLimit = liHeight < liHeightLimit;
+
+  const currentScrollTop =
+    window.pageYOffset || document.documentElement.scrollTop;
 
   // Logging variables for debugging
   console.log(`\nli \#${li.id}: --- Debug Info ---`);
@@ -59,7 +63,20 @@ function handleLiScroll(event) {
     );
   }
 
-  // Apply sticky class and padding
+  function handleScrollDirection() {
+    if (currentScrollTop > lastScrollTop) {
+      // Scrolling down
+      topInLi.classList.add("hide");
+      topInLi.classList.remove("show");
+    } else {
+      // Scrolling up
+      topInLi.classList.add("show");
+      topInLi.classList.remove("hide");
+    }
+    lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; // For Mobile or negative scrolling
+  }
+
+  // Turn On moment
   if (
     !belowHeightLimit &&
     rect.top < suspendTop &&
@@ -69,7 +86,9 @@ function handleLiScroll(event) {
       console.log("Adding sticky class");
       addStickyClass();
     }
+    handleScrollDirection();
   } else {
+    // Turn Off moment
     if (topInLi.classList.contains("sticky")) {
       console.log("Removing sticky class");
       removeClasses();
@@ -83,6 +102,7 @@ function handleLiScroll(event) {
     !fullyVisible &&
     !belowHeightLimit
   ) {
+    // Turn Off moment
     if (topInLi.classList.contains("sticky")) {
       console.log("Forcing removal of sticky class");
       removeClasses();

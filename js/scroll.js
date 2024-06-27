@@ -141,6 +141,11 @@ function handleLiScroll(event) {
   lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; // Update lastScrollTop at the end of the function
 }
 
+// Add event listeners to all li elements
+document.querySelectorAll("li").forEach((li) => {
+  li.addEventListener("scroll", handleLiScroll);
+});
+
 function addScrollListener(li) {
   const debouncedScrollHandler = debounce(
     () => {

@@ -44,9 +44,11 @@ function handleLiScroll(event) {
         if (scrollingDown) {
           console.log("Scrolling down, adding hide class");
           topInLi.classList.add("hide");
+          topInLi.classList.remove("show");
         } else {
           console.log("Scrolling up, adding show class");
           topInLi.classList.add("show");
+          topInLi.classList.remove("hide");
         }
         console.log(
           `After adding transition class: topInLi.classList = ${topInLi.classList}`

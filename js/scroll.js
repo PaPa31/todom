@@ -28,11 +28,13 @@ function handleLiScroll(event) {
     topInLi.style.width = `${topInLiWidth}px`;
     topInLi.classList.add("sticky");
 
-    // double requestAnimationFrame ensures that the DOM update is fully processed before applying the next class
+    // Use requestAnimationFrame to ensure the class is added before transitioning
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
+      if (scrollingDown) {
+        topInLi.classList.add("hide");
+      } else {
         topInLi.classList.add("show");
-      });
+      }
     });
   }
 
@@ -49,20 +51,6 @@ function handleLiScroll(event) {
     );
   }
 
-  function handleScrollDirection() {
-    if (scrollingDown) {
-      // Scrolling down
-      console.log("Scrolling down");
-      topInLi.classList.add("hide");
-      topInLi.classList.remove("show");
-    } else {
-      // Scrolling up
-      console.log("Scrolling up");
-      topInLi.classList.add("show");
-      topInLi.classList.remove("hide");
-    }
-  }
-
   // Turn On moment
   if (
     !belowHeightLimit &&
@@ -73,8 +61,17 @@ function handleLiScroll(event) {
     if (!topInLi.classList.contains("sticky")) {
       console.log("Adding sticky class");
       addStickyClass();
+    } else {
+      if (scrollingDown) {
+        console.log("Scrolling down");
+        topInLi.classList.add("hide");
+        topInLi.classList.remove("show");
+      } else {
+        console.log("Scrolling up");
+        topInLi.classList.add("show");
+        topInLi.classList.remove("hide");
+      }
     }
-    handleScrollDirection();
   } else {
     // Turn Off moment
     console.log("Turn Off moment");

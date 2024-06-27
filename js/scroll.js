@@ -23,19 +23,12 @@ function handleLiScroll(event) {
     window.pageYOffset || document.documentElement.scrollTop;
 
   // Logging variables for debugging
-  console.log(`\nli \#${li.id}: --- Debug Info ---`);
-  console.log(`liHeight: ${liHeight}`);
-  console.log(`topInLiHeight: ${topInLiHeight}`);
-  console.log(`rect.top: ${rect.top}`);
-  console.log(`rect.bottom: ${rect.bottom}`);
-  console.log(`window.innerHeight: ${window.innerHeight}`);
-  //console.log(topInLi.getBoundingClientRect());
-  //console.log(`topInLi.clientWidth: ${topInLi.clientWidth}`);
-  //console.log(
-  //  `topInLi.getBoundingClientRect().width: ${
-  //    topInLi.getBoundingClientRect().width
-  //  }`
-  //);
+  //console.log(`\nli \#${li.id}: --- Debug Info ---`);
+  //console.log(`liHeight: ${liHeight}`);
+  //console.log(`topInLiHeight: ${topInLiHeight}`);
+  //console.log(`rect.top: ${rect.top}`);
+  //console.log(`rect.bottom: ${rect.bottom}`);
+  //console.log(`window.innerHeight: ${window.innerHeight}`);
 
   function addStickyClass() {
     li.style.paddingTop = `${topInLiHeight}px`; // Set the paddingTop first to avoid jerking
@@ -66,10 +59,12 @@ function handleLiScroll(event) {
   function handleScrollDirection() {
     if (currentScrollTop > lastScrollTop) {
       // Scrolling down
+      console.log("Scrolling down");
       topInLi.classList.add("hide");
       topInLi.classList.remove("show");
     } else {
       // Scrolling up
+      console.log("Scrolling up");
       topInLi.classList.add("show");
       topInLi.classList.remove("hide");
     }

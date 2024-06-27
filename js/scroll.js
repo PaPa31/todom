@@ -1,7 +1,7 @@
 const liHeightLimit = 300; // Define the maximum height limit for sticky behavior
 let predictBottom = 100;
 let suspendTop = -200;
-let lastScrollTop = 0;
+let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
 // Function to handle scroll events on a specific li element
 function handleLiScroll(event) {
@@ -21,14 +21,7 @@ function handleLiScroll(event) {
 
   const currentScrollTop =
     window.pageYOffset || document.documentElement.scrollTop;
-
-  // Logging variables for debugging
-  //console.log(`\nli \#${li.id}: --- Debug Info ---`);
-  //console.log(`liHeight: ${liHeight}`);
-  //console.log(`topInLiHeight: ${topInLiHeight}`);
-  //console.log(`rect.top: ${rect.top}`);
-  //console.log(`rect.bottom: ${rect.bottom}`);
-  //console.log(`window.innerHeight: ${window.innerHeight}`);
+  const scrollingDown = currentScrollTop > lastScrollTop;
 
   function addStickyClass() {
     li.style.paddingTop = `${topInLiHeight}px`; // Set the paddingTop first to avoid jerking
@@ -57,7 +50,7 @@ function handleLiScroll(event) {
   }
 
   function handleScrollDirection() {
-    if (currentScrollTop > lastScrollTop) {
+    if (scrollingDown) {
       // Scrolling down
       console.log("Scrolling down");
       topInLi.classList.add("hide");
@@ -68,7 +61,6 @@ function handleLiScroll(event) {
       topInLi.classList.add("show");
       topInLi.classList.remove("hide");
     }
-    lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; // For Mobile or negative scrolling
   }
 
   // Turn On moment
@@ -106,6 +98,8 @@ function handleLiScroll(event) {
       removeClasses();
     }
   }
+
+  lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; // Update lastScrollTop at the end of the function
 }
 
 function addScrollListener(li) {

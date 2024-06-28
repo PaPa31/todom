@@ -7,79 +7,72 @@ let lastScrollTop = 0; // Variable to store last scroll position
 function handleLiScroll(event) {
   const li = event.target;
   const topInLi = li.querySelector(".top-in-li");
+  const topInLiElements = document.querySelectorAll(".top-in-li");
+  let clone;
+  let lastScrollY = window.scrollY;
 
-  if (!topInLi) return; // Skip if there's no .top-in-li div
-
-  const rect = li.getBoundingClientRect();
-  const liHeight = li.clientHeight;
-
-  // Check if the li element is below the height limit for sticky behavior
-  const belowHeightLimit = liHeight < liHeightLimit;
-
-  // Get the current scroll position
-  const currentScrollTop =
-    window.pageYOffset || document.documentElement.scrollTop;
-
-  // Determine scroll direction
-  const scrollingDown = currentScrollTop > lastScrollTop;
-  lastScrollTop = currentScrollTop;
-
-  const topInLiWidth =
-    topInLi.getBoundingClientRect().width + topInLi.getBoundingClientRect().x; // don't touch
-
-  // Function to create and position the cloned element
-  function createClonedElement() {
-    if (!clonedTopInLi) {
-      clonedTopInLi = topInLi.cloneNode(true); // Create a deep clone of topInLi
-      clonedTopInLi.classList.add("cloned-sticky"); // Add a class for styling
-
-      // Apply initial styles to the cloned element
-      //clonedTopInLi.style.position = "fixed";
-      clonedTopInLi.style.top = "-100%"; // Initially hidden above viewport
-      clonedTopInLi.style.width = `${topInLiWidth}px`;
-      //clonedTopInLi.style.zIndex = "1000";
-      //clonedTopInLi.style.backgroundColor = "var(--todom-text-background)";
-      //clonedTopInLi.style.transition = "top 0.2s ease"; // Smooth transition for top property
-
-      // Append the cloned element to the document body
-      li.appendChild(clonedTopInLi);
-      console.log("Cloned element created."); // Log creation of cloned element
-      topInLi.style.display = "none";
+  const createClone = (element) => {
+    if (!clone) {
+      clone = element.cloneNode(true);
+      clone.classList.add("clone");
+      document.body.appendChild(clone);
     }
-  }
+  };
 
-  // Function to remove the cloned element
-  function removeClonedElement() {
-    if (clonedTopInLi) {
-      clonedTopInLi.remove(); // Remove the cloned element from the DOM
-      clonedTopInLi = null; // Clear reference
-      console.log("Cloned element removed."); // Log removal of cloned element
-      topInLi.style.display = "";
+  const removeClone = () => {
+    if (clone) {
+      clone.remove();
+      clone = null;
     }
-  }
+  };
 
-  // Turn On sticky behavior if conditions are met
-  if (!belowHeightLimit && rect.top < -200 && rect.bottom > 100) {
-    if (!clonedTopInLi) {
-      createClonedElement(); // Create cloned element when turning on sticky
-    }
-    //clonedTopInLi.style.top = "0"; // Show the cloned element
-  } else {
-    // Turn Off sticky behavior
-    if (clonedTopInLi) {
-      //clonedTopInLi.style.top = "-100%"; // Hide the cloned element
-      removeClonedElement(); // Remove cloned element when turning off sticky
-    }
-  }
+  const updateCloneVisibility = () => {
+    const currentScrollY = window.scrollY;
+    const scrollingDown = currentScrollY > lastScrollY;
+    lastScrollY = currentScrollY;
 
-  // Toggle visibility of cloned element based on scroll direction
-  if (clonedTopInLi) {
-    if (scrollingDown) {
-      clonedTopInLi.style.top = "-100%"; // Scroll down: hide cloned element
-    } else {
-      clonedTopInLi.style.top = "0"; // Scroll up: show cloned element
+    topInLiElements.forEach((topInLi) => {
+      const rect = topInLi.getBoundingClientRect();
+      const suspendTop = -200;
+      const predictBottom = 100;
+
+      if (scrollingDown) {
+        console.log("\n <--- SCROLLING DOWN --->");
+        if (rect.top <= suspendTop && rect.bottom > predictBottom && !clone) {
+          createClone(topInLi);
+          clone.classList.add("hide");
+        } else if (
+          (rect.bottom <= predictBottom || rect.top > suspendTop) &&
+          clone
+        ) {
+          removeClone();
+        }
+      } else {
+        console.log("\n <--- SCROLLING UP --->");
+        if (rect.top <= suspendTop && rect.bottom > predictBottom && !clone) {
+          createClone(topInLi);
+          clone.classList.add("show");
+        } else if (
+          (rect.bottom <= predictBottom || rect.top > suspendTop) &&
+          clone
+        ) {
+          removeClone();
+        }
+      }
+    });
+
+    if (clone) {
+      if (scrollingDown) {
+        clone.classList.add("hide");
+        clone.classList.remove("show");
+      } else {
+        clone.classList.add("show");
+        clone.classList.remove("hide");
+      }
     }
-  }
+  };
+
+  updateCloneVisibility();
 }
 
 function addScrollListener(li) {

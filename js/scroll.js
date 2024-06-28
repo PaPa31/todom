@@ -2,9 +2,7 @@ const liHeightLimit = 300; // Define the maximum height limit for sticky behavio
 let predictBottom = 100;
 let suspendTop = -200;
 let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-let canAddStickyClass = true; // Flag to control sticky class re-addition
 
-// Function to handle scroll events on a specific li element
 function handleLiScroll(event) {
   const li = event.target;
   const topInLi = li.querySelector(".top-in-li");
@@ -16,32 +14,24 @@ function handleLiScroll(event) {
     topInLi.getBoundingClientRect().height + topInLi.getBoundingClientRect().x;
   const topInLiWidth = topInLi.clientWidth;
 
-  const topVisible = rect.top >= 0 && rect.top <= window.innerHeight;
-  const fullyVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
-  const belowHeightLimit = liHeight < liHeightLimit;
-
   const currentScrollTop =
     window.pageYOffset || document.documentElement.scrollTop;
   const scrollingDown = currentScrollTop > lastScrollTop;
+  const topVisible = rect.top >= 0 && rect.top <= window.innerHeight;
+  const fullyVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+  const belowHeightLimit = liHeight < liHeightLimit;
 
   function addStickyClass() {
     console.log("Adding sticky class:");
     console.log(
       `Before adding sticky: topInLiHeight=${topInLiHeight}, topInLiWidth=${topInLiWidth}`
     );
-    li.style.paddingTop = `${topInLiHeight}px`; // Set the paddingTop first to avoid jerking
+    li.style.paddingTop = `${topInLiHeight}px`;
     topInLi.style.width = `${topInLiWidth}px`;
     topInLi.classList.add("sticky");
 
-    console.log(
-      `After adding sticky: topInLi.classList = ${topInLi.classList}`
-    );
-
-    // Use requestAnimationFrame to ensure the class is added before transitioning
     requestAnimationFrame(() => {
-      console.log("Inside first requestAnimationFrame:");
       requestAnimationFrame(() => {
-        console.log("Inside second requestAnimationFrame:");
         if (scrollingDown) {
           console.log("Scrolling down, adding hide class");
           topInLi.classList.add("hide");
@@ -76,10 +66,6 @@ function handleLiScroll(event) {
           li.style.paddingTop = "";
           topInLi.classList.remove("sticky", "show", "hide");
           topInLi.style.width = "";
-          canAddStickyClass = true; // Allow re-adding sticky class after transition ends
-          console.log(
-            `After removal: topInLi.classList = ${topInLi.classList}`
-          );
         },
         { once: true }
       );
@@ -88,76 +74,67 @@ function handleLiScroll(event) {
     }
   }
 
-  // Turn On moment
-  if (
-    !belowHeightLimit &&
-    rect.top < suspendTop &&
-    rect.bottom > predictBottom
-  ) {
-    console.log(
-      "Turn On moment: rect.top =",
-      rect.top,
-      "suspendTop =",
-      suspendTop,
-      "rect.bottom =",
-      rect.bottom,
-      "predictBottom =",
-      predictBottom
-    );
-    if (!topInLi.classList.contains("sticky") && canAddStickyClass) {
-      console.log("Adding sticky class");
-      addStickyClass();
-      canAddStickyClass = false; // Prevent immediate re-addition of sticky class
-    } else {
-      if (scrollingDown) {
-        console.log("Scrolling down");
-        if (!topInLi.classList.contains("hide")) {
-          topInLi.classList.add("hide");
-          topInLi.classList.remove("show");
-        }
+  // Handle scrolling down
+  if (scrollingDown) {
+    if (
+      !belowHeightLimit &&
+      rect.top < suspendTop &&
+      rect.bottom > predictBottom
+    ) {
+      console.log(
+        "Turn On moment: rect.top =",
+        rect.top,
+        "suspendTop =",
+        suspendTop,
+        "rect.bottom =",
+        rect.bottom,
+        "predictBottom =",
+        predictBottom
+      );
+      if (!topInLi.classList.contains("sticky")) {
+        addStickyClass();
       } else {
-        console.log("Scrolling up");
-        if (!topInLi.classList.contains("show")) {
-          topInLi.classList.add("show");
-          topInLi.classList.remove("hide");
-        }
+        topInLi.classList.add("hide");
+        topInLi.classList.remove("show");
+      }
+    } else {
+      if (topInLi.classList.contains("sticky")) {
+        removeClasses();
       }
     }
-  } else {
-    // Turn Off moment
-    console.log(
-      "Turn Off moment: rect.top =",
-      rect.top,
-      "rect.bottom =",
-      rect.bottom
-    );
-    if (topInLi.classList.contains("sticky")) {
-      console.log("Removing sticky class");
-      removeClasses();
+  }
+
+  // Handle scrolling up
+  if (!scrollingDown) {
+    if (
+      !belowHeightLimit &&
+      rect.top < suspendTop &&
+      rect.bottom > predictBottom
+    ) {
+      console.log(
+        "Turn On moment: rect.top =",
+        rect.top,
+        "suspendTop =",
+        suspendTop,
+        "rect.bottom =",
+        rect.bottom,
+        "predictBottom =",
+        predictBottom
+      );
+      if (!topInLi.classList.contains("sticky")) {
+        addStickyClass();
+      } else {
+        topInLi.classList.add("show");
+        topInLi.classList.remove("hide");
+      }
+    } else {
+      if (topInLi.classList.contains("sticky")) {
+        removeClasses();
+      }
     }
   }
 
-  // Remove sticky class and padding when the li is no longer in the viewport
-  if (
-    rect.bottom <= predictBottom &&
-    !topVisible &&
-    !fullyVisible &&
-    !belowHeightLimit
-  ) {
-    // Turn Off moment
-    console.log(
-      "Turn Off moment 2: rect.bottom =",
-      rect.bottom,
-      "predictBottom =",
-      predictBottom
-    );
-    if (topInLi.classList.contains("sticky")) {
-      console.log("Forcing removal of sticky class");
-      removeClasses();
-    }
-  }
-
-  lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; // Update lastScrollTop at the end of the function
+  lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
 }
 
 function addScrollListener(li) {

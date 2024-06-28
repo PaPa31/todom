@@ -1,4 +1,4 @@
-const liHeightLimit = 300; // Define the maximum height limit for sticky behavior
+const liHeightLimit = 300;
 let predictBottom = 100;
 let suspendTop = -200;
 let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -6,7 +6,7 @@ let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
 function handleLiScroll(event) {
   const li = event.target;
   const topInLi = li.querySelector(".top-in-li");
-  if (!topInLi) return; // Skip if there's no .top-in-li div
+  if (!topInLi) return;
 
   const rect = li.getBoundingClientRect();
   const liHeight = li.clientHeight;
@@ -51,33 +51,16 @@ function handleLiScroll(event) {
   function removeClasses() {
     console.log("Removing classes:");
     console.log(`Before removal: topInLi.classList = ${topInLi.classList}`);
-    if (
-      topInLi.classList.contains("sticky") ||
-      topInLi.classList.contains("show") ||
-      topInLi.classList.contains("hide")
-    ) {
-      topInLi.classList.add("hide");
-      topInLi.addEventListener(
-        "transitionend",
-        function () {
-          console.log(
-            "Transition ended, removing sticky, show, and hide classes"
-          );
-          li.style.paddingTop = "";
-          topInLi.classList.remove("sticky", "show", "hide");
-          topInLi.style.width = "";
-          console.log(
-            `After removal: topInLi.classList = ${topInLi.classList}`
-          );
-        },
-        { once: true }
-      );
-    } else {
-      console.log("No classes to remove");
-    }
+    topInLi.addEventListener("transitionend", function transitionEndHandler() {
+      console.log("Transition ended, removing sticky, show, and hide classes");
+      li.style.paddingTop = "";
+      topInLi.classList.remove("sticky", "show", "hide");
+      topInLi.style.width = "";
+      console.log(`After removal: topInLi.classList = ${topInLi.classList}`);
+      topInLi.removeEventListener("transitionend", transitionEndHandler);
+    });
   }
 
-  // Handle scrolling down
   if (scrollingDown) {
     console.log(`\n <--- SCROLLING DOWN --->`);
     if (
@@ -108,7 +91,6 @@ function handleLiScroll(event) {
     }
   }
 
-  // Handle scrolling up
   if (!scrollingDown) {
     console.log(`\n <--- SCROLLING UP --->`);
     if (

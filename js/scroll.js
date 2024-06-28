@@ -21,7 +21,7 @@ function handleLiScroll(event) {
     clone.style.transform = "translateY(-100%)";
     clone.style.backgroundColor = "var(--todom-text-background)";
     clone.style.display = "none"; // Hide initially
-    document.body.appendChild(clone);
+    li.appendChild(clone); // Append clone to the current li element
     topInLi._clone = clone; // Save reference to the clone
   }
 

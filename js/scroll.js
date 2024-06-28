@@ -2,6 +2,7 @@ const liHeightLimit = 300; // Define the maximum height limit for sticky behavio
 let predictBottom = 100;
 let suspendTop = -200;
 let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+let canAddStickyClass = true; // Flag to control sticky class re-addition
 
 // Function to handle scroll events on a specific li element
 function handleLiScroll(event) {
@@ -59,19 +60,32 @@ function handleLiScroll(event) {
 
   function removeClasses() {
     console.log("Removing classes:");
-    topInLi.classList.add("hide");
-    topInLi.addEventListener(
-      "transitionend",
-      function () {
-        console.log(
-          "Transition ended, removing sticky, show, and hide classes"
-        );
-        li.style.paddingTop = "";
-        topInLi.classList.remove("sticky", "show", "hide");
-        topInLi.style.width = "";
-      },
-      { once: true }
-    );
+    console.log(`Before removal: topInLi.classList = ${topInLi.classList}`);
+    if (
+      topInLi.classList.contains("sticky") ||
+      topInLi.classList.contains("show") ||
+      topInLi.classList.contains("hide")
+    ) {
+      topInLi.classList.add("hide");
+      topInLi.addEventListener(
+        "transitionend",
+        function () {
+          console.log(
+            "Transition ended, removing sticky, show, and hide classes"
+          );
+          li.style.paddingTop = "";
+          topInLi.classList.remove("sticky", "show", "hide");
+          topInLi.style.width = "";
+          canAddStickyClass = true; // Allow re-adding sticky class after transition ends
+          console.log(
+            `After removal: topInLi.classList = ${topInLi.classList}`
+          );
+        },
+        { once: true }
+      );
+    } else {
+      console.log("No classes to remove");
+    }
   }
 
   // Turn On moment
@@ -90,9 +104,10 @@ function handleLiScroll(event) {
       "predictBottom =",
       predictBottom
     );
-    if (!topInLi.classList.contains("sticky")) {
+    if (!topInLi.classList.contains("sticky") && canAddStickyClass) {
       console.log("Adding sticky class");
       addStickyClass();
+      canAddStickyClass = false; // Prevent immediate re-addition of sticky class
     } else {
       if (scrollingDown) {
         console.log("Scrolling down");

@@ -40,6 +40,7 @@ function handleLiScroll(event) {
       rect.bottom > predictBottom &&
       clone.style.display === "none"
     ) {
+      console.log("Turn On moment");
       clone.style.transform = "translateY(0)";
       clone.style.display = "block";
       console.log("Clone shown:", clone);
@@ -47,6 +48,7 @@ function handleLiScroll(event) {
       (rect.bottom <= predictBottom || rect.top > suspendTop) &&
       clone.style.display === "block"
     ) {
+      console.log("Turn Off moment");
       clone.style.transform = "translateY(-100%)";
       clone.style.display = "none";
       console.log("Clone hidden");
@@ -58,6 +60,7 @@ function handleLiScroll(event) {
       rect.bottom > predictBottom &&
       clone.style.display === "none"
     ) {
+      console.log("Turn On moment");
       clone.style.transform = "translateY(0)";
       clone.style.display = "block";
       console.log("Clone shown:", clone);
@@ -65,6 +68,7 @@ function handleLiScroll(event) {
       (rect.bottom <= predictBottom || rect.top > suspendTop) &&
       clone.style.display === "block"
     ) {
+      console.log("Turn Off moment");
       clone.style.transform = "translateY(-100%)";
       clone.style.display = "none";
       console.log("Clone hidden");

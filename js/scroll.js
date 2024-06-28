@@ -43,6 +43,7 @@ function handleLiScroll(event) {
       console.log("Turn On moment");
       clone.style.transform = "translateY(0)";
       clone.style.display = "block";
+      topInLi.style.display = "none"; // Hide the original topInLi
       console.log("Clone created");
     } else if (
       (rect.bottom <= predictBottom || rect.top > suspendTop) &&
@@ -51,6 +52,7 @@ function handleLiScroll(event) {
       console.log("Turn Off moment");
       clone.style.transform = "translateY(-100%)";
       clone.style.display = "none";
+      topInLi.style.display = "block"; // Show the original topInLi
       li.removeChild(clone); // Remove clone from DOM
       topInLi._clone = null; // Clear reference to the clone
       console.log("Clone destroyed");
@@ -65,6 +67,7 @@ function handleLiScroll(event) {
       console.log("Turn On moment");
       clone.style.transform = "translateY(0)";
       clone.style.display = "block";
+      topInLi.style.display = "none"; // Hide the original topInLi
       console.log("Clone created");
     } else if (
       (rect.bottom <= predictBottom || rect.top > suspendTop) &&
@@ -73,6 +76,7 @@ function handleLiScroll(event) {
       console.log("Turn Off moment");
       clone.style.transform = "translateY(-100%)";
       clone.style.display = "none";
+      topInLi.style.display = "block"; // Show the original topInLi
       li.removeChild(clone); // Remove clone from DOM
       topInLi._clone = null; // Clear reference to the clone
       console.log("Clone destroyed");

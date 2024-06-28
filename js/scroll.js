@@ -6,27 +6,32 @@ let lastScrollTop = 0; // Variable to store last scroll position
 
 let lastScrollY = window.scrollY;
 
-const suspendTop = -200;
-const predictBottom = 100;
-
 function handleLiScroll(event) {
   const li = event.target;
   const topInLi = li.querySelector(".top-in-li");
-  let clone = topInLi.cloneNode(true);
-  clone.classList.add("clone");
-  clone.style.position = "fixed";
-  clone.style.top = "0";
-  clone.style.width = "100%";
-  clone.style.zIndex = "1000";
-  clone.style.transform = "translateY(-100%)";
-  clone.style.backgroundColor = "var(--todom-text-background)";
-  clone.style.display = "none"; // Hide initially
-  document.body.appendChild(clone);
 
+  // Create and configure the clone if it doesn't exist
+  if (!topInLi._clone) {
+    const clone = topInLi.cloneNode(true);
+    clone.classList.add("clone");
+    clone.style.position = "fixed";
+    clone.style.top = "0";
+    clone.style.width = "100%";
+    clone.style.zIndex = "1000";
+    clone.style.transform = "translateY(-100%)";
+    clone.style.backgroundColor = "var(--todom-text-background)";
+    clone.style.display = "none"; // Hide initially
+    document.body.appendChild(clone);
+    topInLi._clone = clone; // Save reference to the clone
+  }
+
+  const clone = topInLi._clone;
   const currentScrollY = window.scrollY;
   const scrollingDown = currentScrollY > lastScrollY;
   lastScrollY = currentScrollY; // Update lastScrollY here
   const rect = li.getBoundingClientRect();
+  const suspendTop = -200;
+  const predictBottom = 100;
 
   if (scrollingDown) {
     console.log("\n <--- SCROLLING DOWN --->");
@@ -66,6 +71,7 @@ function handleLiScroll(event) {
     }
   }
 }
+
 function addScrollListener(li) {
   const debouncedScrollHandler = debounce(
     () => {

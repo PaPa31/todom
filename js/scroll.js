@@ -10,7 +10,8 @@ function handleLiScroll(event) {
 
   const rect = li.getBoundingClientRect();
   const liHeight = li.clientHeight;
-  const topInLiHeight = topInLi.getBoundingClientRect().height;
+  topInLiHeight =
+    topInLi.getBoundingClientRect().height + topInLi.getBoundingClientRect().x; // don't touch this
   const topInLiWidth = topInLi.clientWidth;
 
   const currentScrollTop =
@@ -47,14 +48,27 @@ function handleLiScroll(event) {
   function removeClasses() {
     console.log("Removing classes:");
     console.log(`Before removal: topInLi.classList = ${topInLi.classList}`);
-    topInLi.addEventListener("transitionend", function transitionEndHandler() {
-      console.log("Transition ended, removing sticky, show, and hide classes");
-      li.style.paddingTop = "";
-      topInLi.classList.remove("sticky", "show", "hide");
-      topInLi.style.width = "";
-      console.log(`After removal: topInLi.classList = ${topInLi.classList}`);
-      topInLi.removeEventListener("transitionend", transitionEndHandler);
-    });
+    topInLi.addEventListener(
+      "transitionend",
+      function transitionEndHandler(event) {
+        // Ensure the transitionend event is for the topInLi element
+        if (event.target === topInLi) {
+          console.log(
+            "Transition ended, removing sticky, show, and hide classes"
+          );
+          li.style.paddingTop = "";
+          topInLi.classList.remove("sticky", "show", "hide");
+          topInLi.style.width = "";
+          console.log(
+            `After removal: topInLi.classList = ${topInLi.classList}`
+          );
+          topInLi.removeEventListener("transitionend", transitionEndHandler);
+        } else {
+          console.log("Transitionend event not for topInLi:", event.target);
+        }
+      },
+      { once: true } // Remove the event listener after it's been triggered once
+    );
   }
 
   console.log(`\n <--- SCROLLING ${scrollingDown ? "DOWN" : "UP"} --->`);

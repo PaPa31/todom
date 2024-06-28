@@ -9,27 +9,9 @@ let lastScrollY = window.scrollY;
 function handleLiScroll(event) {
   const li = event.target;
   const topInLi = li.querySelector(".top-in-li");
-
-  // Create and configure the clone if it doesn't exist
-  if (!topInLi._clone) {
-    const clone = topInLi.cloneNode(true);
-    clone.classList.add("clone");
-    clone.style.position = "fixed";
-    clone.style.top = "0";
-    clone.style.width = "100%";
-    clone.style.zIndex = "1000";
-    clone.style.transform = "translateY(-100%)";
-    clone.style.backgroundColor = "var(--todom-text-background)";
-    clone.style.display = "none"; // Hide initially
-    li.appendChild(clone); // Append clone to the current li element
-    topInLi._clone = clone; // Save reference to the clone
-    console.log("Clone created and added to DOM");
-  }
-
-  const clone = topInLi._clone;
   const currentScrollY = window.scrollY;
   const scrollingDown = currentScrollY > lastScrollY;
-  lastScrollY = currentScrollY; // Update lastScrollY here
+  lastScrollY = currentScrollY;
   const rect = li.getBoundingClientRect();
   const suspendTop = -200;
   const predictBottom = 100;
@@ -39,44 +21,60 @@ function handleLiScroll(event) {
     if (
       rect.top <= suspendTop &&
       rect.bottom > predictBottom &&
-      clone.style.display === "none"
+      !topInLi._clone
     ) {
-      console.log("Turn On moment");
+      console.log("Turn On moment - creating clone");
+      const clone = topInLi.cloneNode(true);
+      clone.classList.add("clone");
+      clone.style.position = "fixed";
+      clone.style.top = "0";
+      clone.style.width = "100%";
+      clone.style.zIndex = "1000";
       clone.style.transform = "translateY(0)";
-      clone.style.display = "block";
+      clone.style.backgroundColor = "var(--todom-text-background)";
+      li.appendChild(clone); // Append clone to the current li element
+      topInLi._clone = clone; // Save reference to the clone
       topInLi.style.display = "none"; // Hide the original topInLi
-      console.log("Clone shown");
+      console.log("Clone created and added to DOM");
     } else if (
       (rect.bottom <= predictBottom || rect.top > suspendTop) &&
-      clone.style.display === "block"
+      topInLi._clone
     ) {
-      console.log("Turn Off moment");
-      clone.style.transform = "translateY(-100%)";
-      clone.style.display = "none";
+      console.log("Turn Off moment - destroying clone");
+      topInLi._clone.remove();
+      delete topInLi._clone;
       topInLi.style.display = "block"; // Show the original topInLi
-      console.log("Clone hidden");
+      console.log("Clone removed from DOM");
     }
   } else {
     console.log("\n <--- SCROLLING UP --->");
     if (
       rect.top <= suspendTop &&
       rect.bottom > predictBottom &&
-      clone.style.display === "none"
+      !topInLi._clone
     ) {
-      console.log("Turn On moment");
+      console.log("Turn On moment - creating clone");
+      const clone = topInLi.cloneNode(true);
+      clone.classList.add("clone");
+      clone.style.position = "fixed";
+      clone.style.top = "0";
+      clone.style.width = "100%";
+      clone.style.zIndex = "1000";
       clone.style.transform = "translateY(0)";
-      clone.style.display = "block";
+      clone.style.backgroundColor = "var(--todom-text-background)";
+      li.appendChild(clone); // Append clone to the current li element
+      topInLi._clone = clone; // Save reference to the clone
       topInLi.style.display = "none"; // Hide the original topInLi
-      console.log("Clone shown");
+      console.log("Clone created and added to DOM");
     } else if (
       (rect.bottom <= predictBottom || rect.top > suspendTop) &&
-      clone.style.display === "block"
+      topInLi._clone
     ) {
-      console.log("Turn Off moment");
-      clone.style.transform = "translateY(-100%)";
-      clone.style.display = "none";
+      console.log("Turn Off moment - destroying clone");
+      topInLi._clone.remove();
+      delete topInLi._clone;
       topInLi.style.display = "block"; // Show the original topInLi
-      console.log("Clone hidden");
+      console.log("Clone removed from DOM");
     }
   }
 }

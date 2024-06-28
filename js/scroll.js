@@ -10,16 +10,12 @@ function handleLiScroll(event) {
 
   const rect = li.getBoundingClientRect();
   const liHeight = li.clientHeight;
-  const topInLiHeight =
-    topInLi.getBoundingClientRect().height + topInLi.getBoundingClientRect().x;
+  const topInLiHeight = topInLi.getBoundingClientRect().height;
   const topInLiWidth = topInLi.clientWidth;
 
   const currentScrollTop =
     window.pageYOffset || document.documentElement.scrollTop;
   const scrollingDown = currentScrollTop > lastScrollTop;
-  const topVisible = rect.top >= 0 && rect.top <= window.innerHeight;
-  const fullyVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
-  const belowHeightLimit = liHeight < liHeightLimit;
 
   function addStickyClass() {
     console.log("Adding sticky class:");
@@ -61,52 +57,12 @@ function handleLiScroll(event) {
     });
   }
 
-  if (scrollingDown) {
-    console.log(`\n <--- SCROLLING DOWN --->`);
-    if (
-      !belowHeightLimit &&
-      rect.top < suspendTop &&
-      rect.bottom > predictBottom
-    ) {
-      console.log(
-        "Turn On moment: rect.top =",
-        rect.top,
-        "suspendTop =",
-        suspendTop,
-        "rect.bottom =",
-        rect.bottom,
-        "predictBottom =",
-        predictBottom
-      );
-      if (!topInLi.classList.contains("sticky")) {
-        addStickyClass();
-      } else {
-        topInLi.classList.add("hide");
-        topInLi.classList.remove("show");
-      }
-    } else {
-      if (topInLi.classList.contains("sticky")) {
-        removeClasses();
-      }
-    }
-  }
-
+  console.log(`\n <--- SCROLLING ${scrollingDown ? "DOWN" : "UP"} --->`);
   if (!scrollingDown) {
-    console.log(`\n <--- SCROLLING UP --->`);
-    if (
-      !belowHeightLimit &&
-      rect.top < suspendTop &&
-      rect.bottom > predictBottom
-    ) {
+    // Scrolling up
+    if (rect.top < suspendTop && rect.bottom > predictBottom) {
       console.log(
-        "Turn On moment: rect.top =",
-        rect.top,
-        "suspendTop =",
-        suspendTop,
-        "rect.bottom =",
-        rect.bottom,
-        "predictBottom =",
-        predictBottom
+        `Turn On moment: rect.top=${rect.top} suspendTop=${suspendTop} rect.bottom=${rect.bottom} predictBottom=${predictBottom}`
       );
       if (!topInLi.classList.contains("sticky")) {
         addStickyClass();
@@ -114,10 +70,23 @@ function handleLiScroll(event) {
         topInLi.classList.add("show");
         topInLi.classList.remove("hide");
       }
-    } else {
-      if (topInLi.classList.contains("sticky")) {
-        removeClasses();
+    } else if (topInLi.classList.contains("sticky")) {
+      removeClasses();
+    }
+  } else {
+    // Scrolling down
+    if (rect.top < suspendTop && rect.bottom > predictBottom) {
+      console.log(
+        `Turn On moment: rect.top=${rect.top} suspendTop=${suspendTop} rect.bottom=${rect.bottom} predictBottom=${predictBottom}`
+      );
+      if (!topInLi.classList.contains("sticky")) {
+        addStickyClass();
+      } else {
+        topInLi.classList.add("hide");
+        topInLi.classList.remove("show");
       }
+    } else if (topInLi.classList.contains("sticky")) {
+      removeClasses();
     }
   }
 

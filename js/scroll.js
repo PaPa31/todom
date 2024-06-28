@@ -4,6 +4,7 @@ let lastKnownScrollY = 0;
 let ticking = false;
 let topInLiHeight = 0;
 let topInLiWidth = 0;
+let clonedTopInLi = null; // Variable to hold reference to the cloned element
 
 function handleLiScroll(event) {
   const li = event.target;
@@ -25,9 +26,6 @@ function handleLiScroll(event) {
   const scrollingDown = currentScrollTop > lastScrollTop;
   lastScrollTop = currentScrollTop;
 
-  // Update known scroll position
-  lastKnownScrollY = currentScrollTop;
-
   // Function to add sticky class and show the element
   function addStickyClass() {
     li.style.paddingTop = `${topInLiHeight}px`; // Set paddingTop to avoid jerking
@@ -40,14 +38,23 @@ function handleLiScroll(event) {
     topInLi.classList.remove("sticky", "show");
   }
 
-  // Function to handle showing/hiding address bar behavior
-  function handleAddressBarBehavior() {
-    if (scrollingDown) {
-      // Scrolling down, hide address bar
-      topInLi.classList.remove("show");
-    } else {
-      // Scrolling up, show address bar
-      topInLi.classList.add("show");
+  // Function to create and position the cloned element
+  function createClonedElement() {
+    clonedTopInLi = topInLi.cloneNode(true); // Create a deep clone of topInLi
+
+    // Apply initial styles to the cloned element
+    clonedTopInLi.style.position = "fixed";
+    clonedTopInLi.style.transform = "translateY(-100%)";
+
+    // Append the cloned element to the document body
+    document.body.appendChild(clonedTopInLi);
+  }
+
+  // Function to remove the cloned element
+  function removeClonedElement() {
+    if (clonedTopInLi) {
+      clonedTopInLi.remove(); // Remove the cloned element from the DOM
+      clonedTopInLi = null; // Clear reference
     }
   }
 
@@ -55,18 +62,16 @@ function handleLiScroll(event) {
   if (!belowHeightLimit && rect.top < -200 && rect.bottom > 100) {
     if (!topInLi.classList.contains("sticky")) {
       addStickyClass();
+      createClonedElement(); // Create cloned element when turning on sticky
     }
   } else {
     // Turn Off sticky behavior
     if (topInLi.classList.contains("sticky")) {
       removeStickyClass();
+      removeClonedElement(); // Remove cloned element when turning off sticky
     }
   }
-
-  // Handle address bar behavior
-  handleAddressBarBehavior();
 }
-
 function addScrollListener(li) {
   const debouncedScrollHandler = debounce(
     () => {

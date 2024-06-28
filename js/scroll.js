@@ -23,7 +23,6 @@ function handleLiScroll(event) {
     clone.style.display = "none"; // Hide initially
     li.appendChild(clone); // Append clone to the current li element
     topInLi._clone = clone; // Save reference to the clone
-    console.log("Clone added to DOM");
   }
 
   const clone = topInLi._clone;
@@ -46,6 +45,7 @@ function handleLiScroll(event) {
       clone.style.display = "block";
       topInLi.style.display = "none"; // Hide the original topInLi
       console.log("Clone shown");
+      console.log("Clone added to DOM");
     } else if (
       (rect.bottom <= predictBottom || rect.top > suspendTop) &&
       clone.style.display === "block"
@@ -70,6 +70,7 @@ function handleLiScroll(event) {
       clone.style.display = "block";
       topInLi.style.display = "none"; // Hide the original topInLi
       console.log("Clone shown");
+      console.log("Clone added to DOM");
     } else if (
       (rect.bottom <= predictBottom || rect.top > suspendTop) &&
       clone.style.display === "block"

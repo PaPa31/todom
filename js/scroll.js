@@ -111,12 +111,16 @@ function handleLiScroll(event) {
     } else {
       if (scrollingDown) {
         console.log("Scrolling down");
-        topInLi.classList.add("hide");
-        topInLi.classList.remove("show");
+        if (!topInLi.classList.contains("hide")) {
+          topInLi.classList.add("hide");
+          topInLi.classList.remove("show");
+        }
       } else {
         console.log("Scrolling up");
-        topInLi.classList.add("show");
-        topInLi.classList.remove("hide");
+        if (!topInLi.classList.contains("show")) {
+          topInLi.classList.add("show");
+          topInLi.classList.remove("hide");
+        }
       }
     }
   } else {

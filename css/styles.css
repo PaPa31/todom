@@ -1678,27 +1678,13 @@ li:not(.folded) .top-in-li {
   overflow: hidden;
 }
 
-.top-in-li {
-  transform: translateY(0);
-}
-
 .cloned-sticky {
   background-color: var(--todom-text-background);
   position: fixed;
-  top: 0;
+  top: -100%; /* Initially hidden above viewport */
   width: 100%;
   z-index: 1000;
-  transform: translateY(-100%);
-}
-
-li:not(.folded) .top-in-li.sticky.show {
-  transform: translateY(0);
-  transition: transform 0.3s ease-in-out;
-}
-
-li:not(.folded) .top-in-li.sticky.hide {
-  transform: translateY(-100%);
-  transition: transform 0.3s ease-in-out;
+  transition: top 0.3s ease-in-out; /* Smooth transition for top property */
 }
 
 @media (min-width: 600px) {

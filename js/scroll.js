@@ -66,6 +66,9 @@ function handleLiScroll(event) {
           li.style.paddingTop = "";
           topInLi.classList.remove("sticky", "show", "hide");
           topInLi.style.width = "";
+          console.log(
+            `After removal: topInLi.classList = ${topInLi.classList}`
+          );
         },
         { once: true }
       );

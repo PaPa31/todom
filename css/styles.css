@@ -1682,7 +1682,7 @@ li:not(.folded) .top-in-li {
   transform: translateY(0);
 }
 
-li:not(.folded) .top-in-li.sticky {
+.cloned-sticky {
   background-color: var(--todom-text-background);
   position: fixed;
   top: 0;

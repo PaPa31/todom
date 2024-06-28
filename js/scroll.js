@@ -76,6 +76,7 @@ function handleLiScroll(event) {
 
   // Handle scrolling down
   if (scrollingDown) {
+    console.log(`\n <--- SCROLLING DOWN --->`);
     if (
       !belowHeightLimit &&
       rect.top < suspendTop &&
@@ -106,6 +107,7 @@ function handleLiScroll(event) {
 
   // Handle scrolling up
   if (!scrollingDown) {
+    console.log(`\n <--- SCROLLING UP --->`);
     if (
       !belowHeightLimit &&
       rect.top < suspendTop &&

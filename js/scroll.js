@@ -18,18 +18,32 @@ function handleLiScroll(event) {
   const scrollingDown = currentScrollY > lastScrollY;
   lastScrollY = currentScrollY;
 
-  // Ensure clone is created only once when Turn On moment is reached
-  if (!cloneCreated && rect.top <= suspendTop && rect.bottom > predictBottom) {
+  console.log(`\n <--- SCROLLING ${scrollingDown ? "DOWN" : "UP"} --->`);
+  console.log(
+    `rect.top=${rect.top} suspendTop=${suspendTop} rect.bottom=${rect.bottom} predictBottom=${predictBottom}`
+  );
+
+  if (
+    scrollingDown &&
+    !cloneCreated &&
+    rect.top <= suspendTop &&
+    rect.bottom > predictBottom
+  ) {
     console.log("Turn On moment - creating clone");
     const clone = topInLi.cloneNode(true);
     clone.classList.add("clone");
+    clone.style.backgroundColor = "var(--todom-text-background)";
+    clone.style.position = "fixed";
+    clone.style.top = "0";
+    clone.style.width = "100%";
+    clone.style.zIndex = "1000";
+    clone.style.transform = "translateY(0)";
     li.appendChild(clone); // Append clone to the current li element
     topInLi.style.display = "none"; // Hide the original topInLi
     cloneCreated = true;
     console.log("Clone created and added to DOM");
-  }
-  // Ensure clone is destroyed only once when Turn Off moment is reached
-  else if (
+  } else if (
+    !scrollingDown &&
     cloneCreated &&
     (rect.bottom <= predictBottom || rect.top > suspendTop)
   ) {

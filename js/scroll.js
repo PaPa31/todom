@@ -15,6 +15,7 @@ function handleLiScroll(event) {
   const suspendTop = -200;
   const predictBottom = 100;
 
+  // Determine the scroll direction
   const scrollingDown = currentScrollY > lastScrollY;
   lastScrollY = currentScrollY;
 

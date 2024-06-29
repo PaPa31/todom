@@ -1681,10 +1681,11 @@ li:not(.folded) .top-in-li {
 .clone {
   background-color: var(--todom-text-background);
   position: fixed;
-  top: -100%; /* Initially hidden above viewport */
+  /*top: -100%;*/
+  transform: translateY(-100%);
   width: 100%;
   z-index: 1000;
-  transition: top 0.2s ease; /* Smooth transition for top property */
+  transition: transform 0.3s ease-in-out;
 }
 
 @media (min-width: 600px) {

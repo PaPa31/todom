@@ -20,13 +20,13 @@ function handleLiScroll(event) {
     console.log("Turn On moment - creating clone");
     const clone = topInLi.cloneNode(true);
     clone.classList.add("clone");
-    clone.style.display = "block"; // Show the clone
-    clone.style.position = "fixed";
-    clone.style.top = "0";
-    clone.style.width = "100%";
-    clone.style.zIndex = "1000";
-    clone.style.transform = "translateY(-100%)";
-    clone.style.backgroundColor = "var(--todom-text-background)";
+    //clone.style.display = "block"; // Show the clone
+    //clone.style.position = "fixed";
+    //clone.style.top = "0";
+    //clone.style.width = "100%";
+    //clone.style.zIndex = "1000";
+    //clone.style.transform = "translateY(-100%)";
+    //clone.style.backgroundColor = "var(--todom-text-background)";
     li.appendChild(clone); // Append clone to the current li element
     cloneCreated = true;
     cloneDestroyed = false;

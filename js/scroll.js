@@ -22,7 +22,6 @@ function handleLiScroll(event) {
     console.log("Turn On moment - creating clone");
     const clone = topInLi.cloneNode(true);
     clone.classList.add("clone");
-    clone.style.display = "block"; // Show the clone
     li.appendChild(clone); // Append clone to the current li element
     topInLi.style.display = "none"; // Hide the original topInLi
     cloneCreated = true;

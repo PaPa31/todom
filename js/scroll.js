@@ -6,6 +6,7 @@ let lastScrollTop = 0; // Variable to store last scroll position
 
 let cloneCreated = false;
 let cloneDestroyed = true;
+let lastScrollY = window.scrollY;
 
 function handleLiScroll(event) {
   const li = event.target;
@@ -19,6 +20,7 @@ function handleLiScroll(event) {
     console.log("Turn On moment - creating clone");
     const clone = topInLi.cloneNode(true);
     clone.classList.add("clone");
+    clone.style.display = "block"; // Show the clone
     clone.style.position = "fixed";
     clone.style.top = "0";
     clone.style.width = "100%";

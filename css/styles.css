@@ -1678,7 +1678,7 @@ li:not(.folded) .top-in-li {
   overflow: hidden;
 }
 
-.cloned-sticky {
+.clone {
   background-color: var(--todom-text-background);
   position: fixed;
   top: -100%; /* Initially hidden above viewport */

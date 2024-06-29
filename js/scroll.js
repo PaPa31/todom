@@ -86,4 +86,15 @@ function observeLiElements(li) {
 function unobserveLiElements(li) {
   observer.unobserve(li);
   removeScrollListener(li);
+  console.log("Fold button pressed: - destroying clone");
+  const clone = li.querySelector(".top-in-li.clone");
+  if (clone) {
+    clone.remove();
+  }
+  cloneCreated = false;
+
+  const topInLi = li.querySelector(".top-in-li");
+  if (!topInLi) return;
+  topInLi.style.display = "block";
+  console.log("Fold button pressed: Clone removed from DOM");
 }

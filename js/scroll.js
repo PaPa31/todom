@@ -42,11 +42,7 @@ function handleLiScroll(event) {
     topInLi.style.display = "none"; // Hide the original topInLi
     cloneCreated = true;
     console.log("Clone created and added to DOM");
-  } else if (
-    !scrollingDown &&
-    cloneCreated &&
-    (rect.bottom <= predictBottom || rect.top > suspendTop)
-  ) {
+  } else if (!scrollingDown && cloneCreated && rect.bottom <= predictBottom) {
     console.log("Turn Off moment - destroying clone");
     const clone = li.querySelector(".top-in-li.clone");
     if (clone) {

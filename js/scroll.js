@@ -28,9 +28,11 @@ function handleLiScroll(event) {
     cloneCreated = true;
     console.log("Clone created and added to DOM");
   }
-
   // Ensure clone is destroyed only once when Turn Off moment is reached
-  if (cloneCreated && (rect.bottom <= predictBottom || rect.top > suspendTop)) {
+  else if (
+    cloneCreated &&
+    (rect.bottom <= predictBottom || rect.top > suspendTop)
+  ) {
     console.log("Turn Off moment - destroying clone");
     const clone = li.querySelector(".top-in-li.clone");
     if (clone) {

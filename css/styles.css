@@ -1678,14 +1678,14 @@ li:not(.folded) .top-in-li {
   overflow: hidden;
 }
 
-.clone {
-  background-color: var(--todom-text-background);
+.top-in-li.clone {
+  display: none; /* Hide clone initially */
   position: fixed;
-  /*top: -100%;*/
-  transform: translateY(-100%);
+  top: 0;
   width: 100%;
   z-index: 1000;
-  transition: transform 0.3s ease-in-out;
+  transform: translateY(-100%);
+  background-color: var(--todom-text-background);
 }
 
 @media (min-width: 600px) {

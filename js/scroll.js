@@ -1,4 +1,7 @@
-const liHeightLimit = 300; // Maximum height limit for sticky behavior
+const liHeightLimit = 300; // Maximum height limit for cloned header behavior
+const suspendTop = -200; //
+const predictBottom = 100;
+
 let topInLiHeight = 0;
 
 let clonedTopInLi = null; // Variable to hold reference to the cloned element
@@ -12,17 +15,15 @@ function handleLiScroll(event) {
   const topInLi = li.querySelector(".top-in-li");
   const currentScrollY = window.scrollY;
   const rect = li.getBoundingClientRect();
-  const suspendTop = -200;
-  const predictBottom = 100;
 
   // Determine the scroll direction
   const scrollingDown = currentScrollY > lastScrollY;
   lastScrollY = currentScrollY;
 
   console.log(`\n <--- SCROLLING ${scrollingDown ? "DOWN" : "UP"} --->`);
-  console.log(
-    `rect.top=${rect.top} suspendTop=${suspendTop} rect.bottom=${rect.bottom} predictBottom=${predictBottom}`
-  );
+  //console.log(
+  //  `rect.top=${rect.top} suspendTop=${suspendTop} rect.bottom=${rect.bottom} predictBottom=${predictBottom}`
+  //);
 
   // Create clone only once when reaching the Turn On moment
   if (!cloneCreated && rect.top <= suspendTop && rect.bottom > predictBottom) {

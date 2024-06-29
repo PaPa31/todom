@@ -5,7 +5,6 @@ let clonedTopInLi = null; // Variable to hold reference to the cloned element
 let lastScrollTop = 0; // Variable to store last scroll position
 
 let cloneCreated = false;
-let cloneDestroyed = true;
 let lastScrollY = window.scrollY;
 
 function handleLiScroll(event) {
@@ -24,20 +23,13 @@ function handleLiScroll(event) {
     const clone = topInLi.cloneNode(true);
     clone.classList.add("clone");
     clone.style.display = "block"; // Show the clone
-    clone.style.position = "fixed";
-    clone.style.top = "0";
-    clone.style.width = "100%";
-    clone.style.zIndex = "1000";
-    clone.style.transform = "translateY(-100%)";
-    clone.style.backgroundColor = "var(--todom-text-background)";
     li.appendChild(clone); // Append clone to the current li element
     topInLi.style.display = "none"; // Hide the original topInLi
     cloneCreated = true;
-    cloneDestroyed = false;
     console.log("Clone created and added to DOM");
   } else if (
     (rect.bottom <= predictBottom || rect.top > suspendTop) &&
-    !cloneDestroyed
+    cloneCreated
   ) {
     console.log("Turn Off moment - destroying clone");
     const clone = li.querySelector(".top-in-li.clone");
@@ -46,7 +38,6 @@ function handleLiScroll(event) {
     }
     topInLi.style.display = "block"; // Show the original topInLi
     cloneCreated = false;
-    cloneDestroyed = true;
     console.log("Clone removed from DOM");
   }
 }

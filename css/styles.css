@@ -1684,7 +1684,7 @@ li:not(.folded) .top-in-li {
   top: 0;
   width: 100%;
   z-index: 1000;
-  transform: translateY(-100%);
+  transform: translateY(0);
   background-color: var(--todom-text-background);
 }
 

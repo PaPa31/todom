@@ -9,21 +9,41 @@ let lastScrollTop = 0; // Variable to store last scroll position
 
 let cloneCreated = false;
 let lastScrollY = window.scrollY;
+const debounceThreshold = 50; // Define a threshold for the debounce mechanism
 
 function handleLiScroll(event) {
   const li = event.target;
   const topInLi = li.querySelector(".top-in-li");
   const currentScrollY = window.scrollY;
   const rect = li.getBoundingClientRect();
+  const suspendTop = -200;
+  const predictBottom = 100;
 
   // Determine the scroll direction
   const scrollingDown = currentScrollY > lastScrollY;
   lastScrollY = currentScrollY;
 
   console.log(`\n <--- SCROLLING ${scrollingDown ? "DOWN" : "UP"} --->`);
-  //console.log(
-  //  `rect.top=${rect.top} suspendTop=${suspendTop} rect.bottom=${rect.bottom} predictBottom=${predictBottom}`
-  //);
+  console.log(
+    `rect.top=${rect.top} suspendTop=${suspendTop} rect.bottom=${rect.bottom} predictBottom=${predictBottom}`
+  );
+
+  // Add debounce mechanism
+  if (scrollingDown) {
+    if (cloneCreated && rect.bottom <= predictBottom + debounceThreshold) {
+      // If the clone is created and we are near the Turn Off moment, don't destroy the clone yet
+      return;
+    }
+  } else {
+    if (
+      !cloneCreated &&
+      rect.top <= suspendTop + debounceThreshold &&
+      rect.bottom > predictBottom
+    ) {
+      // If the clone is not created and we are near the Turn On moment, don't create the clone yet
+      return;
+    }
+  }
 
   // Create clone only once when reaching the Turn On moment
   if (!cloneCreated && rect.top <= suspendTop && rect.bottom > predictBottom) {

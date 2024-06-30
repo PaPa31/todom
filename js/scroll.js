@@ -48,7 +48,9 @@ function handleLiScroll(event) {
   // Create clone only once when reaching the Turn On moment
   if (!cloneCreated && rect.top <= suspendTop && rect.bottom > predictBottom) {
     console.log("Turn On moment - creating clone");
-    const clone = topInLi.cloneNode(true);
+    const topInLiHeight =
+      topInLi.getBoundingClientRect().height +
+      topInLi.getBoundingClientRect().x;
     clone.classList.add("clone");
     clone.style.backgroundColor = "var(--todom-text-background)";
     clone.style.position = "fixed";
@@ -65,8 +67,12 @@ function handleLiScroll(event) {
   else if (cloneCreated && rect.bottom <= predictBottom) {
     console.log("Turn Off moment - destroying clone");
     const clone = li.querySelector(".top-in-li.clone");
+    console.log("li", li);
+    console.log("clone 1", clone);
     if (clone) {
+      console.log("clone 2", clone);
       clone.remove();
+      //li.removeChild(clone);
     }
     topInLi.style.display = "block"; // Show the original topInLi
     cloneCreated = false;

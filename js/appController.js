@@ -39,10 +39,12 @@ const appController = (() => {
       link.href = "test/mocha.css";
       document.head.appendChild(link);
 
-      // Загружаем mocha.js, chai.js, затем test-runner.js и test-controller.js
+      // Загружаем mocha.js, chai.min.js, затем test-runner.js и test-controller.js
       loadScript("test/mocha.js", () => {
         loadScript("test/chai.min.js", () => {
           mocha.setup("bdd");
+          // Делаем `expect` глобально доступным
+          window.expect = chai.expect;
           loadScript("js/test-runner.js", () => {
             loadScript("js/test-controller.js", () => {
               mocha.run();

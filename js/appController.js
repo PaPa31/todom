@@ -30,11 +30,25 @@ const appController = (() => {
     document.head.appendChild(script);
   };
 
-  // Запуск тестов, если указан параметр test=true
+  // Загружаем Mocha, Chai, test-runner.js и test-controller.js в тестовом режиме
   const initializeTests = () => {
     if (window.location.search.includes("test=true")) {
-      loadScript("js/test-runner.js", () => {
-        loadScript("js/test-controller.js");
+      // Загружаем mocha.css для стилизации тестов
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "test/mocha.css";
+      document.head.appendChild(link);
+
+      // Загружаем mocha.js, chai.js, затем test-runner.js и test-controller.js
+      loadScript("test/mocha.js", () => {
+        loadScript("test/chai.js", () => {
+          mocha.setup("bdd");
+          loadScript("js/test-runner.js", () => {
+            loadScript("js/test-controller.js", () => {
+              mocha.run();
+            });
+          });
+        });
       });
     }
   };

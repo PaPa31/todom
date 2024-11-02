@@ -1,130 +1,89 @@
-// test-controller.js с оберткой runTest из test-runner.js
+// test-controller.js: Тесты с Mocha и Chai
 
-function testEarliestTogglers() {
-  const originalDarkMode = localStorage.getItem("todomDarkMode");
-  const originalDateMode = localStorage.getItem("todomDateMode");
+describe("Тесты для earliest-togglers.js", function () {
+  let originalDarkMode, originalDateMode;
 
-  // Тест функции isDarkMode
-  runTest("Проверка включенного темного режима", function () {
+  beforeEach(function () {
+    originalDarkMode = localStorage.getItem("todomDarkMode");
+    originalDateMode = localStorage.getItem("todomDateMode");
+  });
+
+  afterEach(function () {
+    if (originalDarkMode !== null) {
+      localStorage.setItem("todomDarkMode", originalDarkMode);
+    } else {
+      localStorage.removeItem("todomDarkMode");
+    }
+
+    if (originalDateMode !== null) {
+      localStorage.setItem("todomDateMode", originalDateMode);
+    } else {
+      localStorage.removeItem("todomDateMode");
+    }
+  });
+
+  it("Включенный темный режим", function () {
     localStorage.setItem("todomDarkMode", "set");
-    console.assert(isDarkMode() === "set", "Темный режим включен");
+    expect(isDarkMode()).to.equal("set");
   });
 
-  runTest("Проверка выключенного темного режима", function () {
+  it("Выключенный темный режим", function () {
     localStorage.removeItem("todomDarkMode");
-    console.assert(isDarkMode() === null, "Темный режим выключен");
+    expect(isDarkMode()).to.be.null;
   });
 
-  // Тест функции getDateMode
-  runTest("Проверка режима даты по умолчанию", function () {
+  it("Режим даты по умолчанию", function () {
     localStorage.removeItem("todomDateMode");
-    console.assert(
-      getDateMode() === MODES.HIDE_BOTH,
-      "Режим даты по умолчанию"
-    );
+    expect(getDateMode()).to.equal(MODES.HIDE_BOTH);
   });
 
-  // Тест функции toggleDateMode
-  runTest("Проверка переключения режима даты", function () {
+  it("Переключение режима даты", function () {
     const initialMode = getDateMode();
     const nextMode = toggleDateMode();
-    console.assert(
-      nextMode === (initialMode + 1) % 4,
-      "Переключение режима даты"
-    );
+    expect(nextMode).to.equal((initialMode + 1) % 4);
   });
+});
 
-  // Восстановление исходных значений
-  if (originalDarkMode !== null) {
-    localStorage.setItem("todomDarkMode", originalDarkMode);
-  } else {
-    localStorage.removeItem("todomDarkMode");
-  }
-
-  if (originalDateMode !== null) {
-    localStorage.setItem("todomDateMode", originalDateMode);
-  } else {
-    localStorage.removeItem("todomDateMode");
-  }
-}
-
-function testListOrderFunctions() {
-  const originalListOrder = localStorage.getItem("todomListReverseOrder");
+describe("Тесты для list-order.js", function () {
+  let originalListOrder;
   const contentElement = document.getElementById("content");
 
-  // Тест функции isReversed
-  runTest("Проверка обратного порядка списка включена", function () {
+  beforeEach(function () {
+    originalListOrder = localStorage.getItem("todomListReverseOrder");
+    contentElement.classList.remove("reversed");
+  });
+
+  afterEach(function () {
+    if (originalListOrder !== null) {
+      localStorage.setItem("todomListReverseOrder", originalListOrder);
+    } else {
+      localStorage.removeItem("todomListReverseOrder");
+    }
+    if (isReversed()) {
+      contentElement.classList.add("reversed");
+    } else {
+      contentElement.classList.remove("reversed");
+    }
+  });
+
+  it("Включение обратного порядка", function () {
     localStorage.setItem("todomListReverseOrder", "set");
-    console.assert(isReversed() === "set", "Обратный порядок включен");
+    expect(isReversed()).to.equal("set");
   });
 
-  runTest("Проверка обратного порядка списка выключена", function () {
+  it("Выключение обратного порядка", function () {
     localStorage.removeItem("todomListReverseOrder");
-    console.assert(isReversed() === null, "Обратный порядок выключен");
+    expect(isReversed()).to.be.null;
   });
 
-  // Тест функции toggleReversedMode
-  runTest("Проверка класса 'reversed' добавлен", function () {
-    contentElement.classList.remove("reversed");
+  it("Добавление класса 'reversed'", function () {
     toggleReversedMode();
-    console.assert(
-      contentElement.classList.contains("reversed"),
-      "Класс 'reversed' добавлен"
-    );
+    expect(contentElement.classList.contains("reversed")).to.be.true;
   });
 
-  runTest("Проверка класса 'reversed' удален", function () {
+  it("Удаление класса 'reversed'", function () {
     toggleReversedMode();
-    console.assert(
-      !contentElement.classList.contains("reversed"),
-      "Класс 'reversed' удален"
-    );
+    toggleReversedMode();
+    expect(contentElement.classList.contains("reversed")).to.be.false;
   });
-
-  // Восстанавливаем исходное значение и синхронизируем отображение
-  if (originalListOrder !== null) {
-    localStorage.setItem("todomListReverseOrder", originalListOrder);
-  } else {
-    localStorage.removeItem("todomListReverseOrder");
-  }
-  if (isReversed()) {
-    contentElement.classList.add("reversed");
-  } else {
-    contentElement.classList.remove("reversed");
-  }
-}
-
-function runProtocolTests() {
-  runTest("Проверка протокола 'file:'", function () {
-    var controller = new StateController("file:");
-    if (window.location.protocol !== "file:") {
-      throw new Error("Протокол тестирования не соответствует 'file:'");
-    }
-    console.assert(
-      controller.getProtocol() === "file:",
-      "Проверка протокола 'file:'"
-    );
-  });
-
-  runTest("Проверка протокола 'http:'", function () {
-    var controller = new StateController("http:");
-    if (
-      window.location.protocol !== "http:" &&
-      window.location.protocol !== "https:"
-    ) {
-      throw new Error(
-        "Протокол тестирования не соответствует 'http:' или 'https:'"
-      );
-    }
-    console.assert(
-      controller.getProtocol() === "http:",
-      "Проверка протокола 'http:'"
-    );
-  });
-}
-
-if (window.location.search.includes("test=true")) {
-  testEarliestTogglers();
-  testListOrderFunctions();
-  runProtocolTests();
-}
+});

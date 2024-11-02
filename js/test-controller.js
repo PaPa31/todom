@@ -1,5 +1,11 @@
 // test-controller.js: Тесты с Mocha и Chai
 
+describe("Проверка работы Chai", function () {
+  it("должен быть доступен 'expect'", function () {
+    expect(true).to.be.true;
+  });
+});
+
 describe("Тесты для earliest-togglers.js", function () {
   let originalDarkMode, originalDateMode;
 

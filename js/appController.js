@@ -41,7 +41,7 @@ const appController = (() => {
 
       // Загружаем mocha.js, chai.js, затем test-runner.js и test-controller.js
       loadScript("test/mocha.js", () => {
-        loadScript("test/chai.js", () => {
+        loadScript("test/chai.min.js", () => {
           mocha.setup("bdd");
           loadScript("js/test-runner.js", () => {
             loadScript("js/test-controller.js", () => {

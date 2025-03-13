@@ -441,8 +441,13 @@ const mdToTagsWithoutShape = (el, text) => {
 };
 
 const markdown = (s) => {
-  s = s.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, "");
-  s = s.replace(/\u200B/, "");
+  // The two lines below result in an annoying scrolling
+  // of the current cursor position to the top of the page.
+  // Moreover, this very top position of the page
+  // is often hidden behind the menu of the current `li`!
+
+  //s = s.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, "");
+  //s = s.replace(/\u200B/, "");
   return marked.parse(s);
 };
 

@@ -48,8 +48,23 @@ function createEditor(parentLi, editIndex, text) {
 
   const resizableDiv = dual.querySelector(".resizable-div");
 
-  const inputListener = () =>
+  const inputListener = () => {
+    // 1. Store open/closed state of <details> blocks
+    const detailsStates = {};
+    resizableDiv.querySelectorAll("details").forEach((details, index) => {
+      detailsStates[index] = details.open; // Save state
+    });
+    // 2. Update preview with new markdown content
     mdUpdate(resizableDiv, _textArea.value, editIndex);
+    // 3. Restore open/closed state of details blocks
+    resizableDiv.querySelectorAll("details").forEach((details, index) => {
+      if (detailsStates[index]) {
+        details.setAttribute("open", ""); // Restore state
+      } else {
+        details.removeAttribute("open");
+      }
+    });
+  };
   __addListener("input", _textArea, inputListener);
 
   editor[editIndex] = !editor[editIndex]; //1

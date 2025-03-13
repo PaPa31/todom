@@ -1094,6 +1094,8 @@ textarea {
   font-family: inherit;
   overflow: auto;
   padding-right: 36px !important; /*this sync dual with God's blessing*/
+  scroll-behavior: smooth;
+  overflow-anchor: none; /*magic: prevent auto-scroll to the top */
 }
 
 textarea#input,

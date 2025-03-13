@@ -1389,6 +1389,7 @@ ol#list-items > li:not(.folded) .dual,
   cursor: pointer;
   width: 100%;
   display: block;
+  min-height: 300px; /* if image not found */
 }
 
 /*if youtube thumbnail cover

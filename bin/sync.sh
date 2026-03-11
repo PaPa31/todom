@@ -58,44 +58,45 @@ sync_project() {
 }
 
 send_notification() {
-  local title icon args action
+  local title="Sync Status"
+  local message="Summary:\n$NOTIFY"
+  local cmd_args=()
 
   if [[ $success == false ]]; then
     title="❌ Sync FAILED!"
-    icon="error"
-    args=(--action="fix:💻 Fix in Terminal")
+    # kdialog --yesnocancel: Yes=Fix, No=Log, Cancel=Exit
+    kdialog --title "$title" --yesnocancel "$message" \
+            --yes-label "💻 Fix in Terminal" \
+            --no-label "📄 Open Log" \
+            --cancel-label "Close" \
+            --icon error \
+            --timeout 10
+    local action=$?
   else
     title="✅ Sync Successful"
-    icon="emblem-success"
+    # kdialog --yesno: Yes=Log, No=Close
+    kdialog --title "$title" --yesno "$message" \
+            --yes-label "📄 Open Log" \
+            --no-label "Close" \
+            --icon emblem-success \
+            --timeout 10
+    local action=$?
   fi
-  args+=(--action="log:📄 Open Log")
 
-  # Capture the action by telling notify-send to WAIT for the user or timeout
-  echo "DEBUG: Waiting for notification click (with --wait flag)..." >> "$LOGFILE"
-#   action=$(notify-send "$title" "$NOTIFY" --icon="$icon" "${args[@]}" --wait)
-  action=$(notify-send "$title" "$NOTIFY" --icon="$icon" "${args[@]}" -p)
+  # KDialog Exit Codes:
+  # 0 = Yes (Fix or Log depending on context)
+  # 1 = No (Log or Close)
+  # 2 = Cancel
+  # 255 = Timeout
 
-  echo "DEBUG: Notification action captured: '$action'" >> "$LOGFILE"
+  echo "DEBUG: KDialog action code: '$action'" >> "$LOGFILE"
 
-
-  case "$action" in
-    "fix")
-      echo "DEBUG: Attempting to launch Konsole in $FAILED_DIR" >> "$LOGFILE"
-      # kstart5 is the KDE way to launch detached GUI apps
-      kstart5 konsole --workdir "$FAILED_DIR" >/dev/null 2>&1 &
-      ;;
-    "log")
-      echo "DEBUG: Attempting to launch KWrite for $LOGFILE" >> "$LOGFILE"
-      # setsid runs the program in a new session entirely
-      setsid kwrite "$LOGFILE" >/dev/null 2>&1 &
-      ;;
-    *)
-      echo "DEBUG: No action or notification timed out." >> "$LOGFILE"
-      ;;
-  esac
-
-  # Ensure the background process detaches
-  disown -a
+  if [[ $success == false ]]; then
+    [[ $action -eq 0 ]] && kstart5 konsole --workdir "$FAILED_DIR" &
+    [[ $action -eq 1 ]] && kstart5 kwrite "$LOGFILE" &
+  else
+    [[ $action -eq 0 ]] && kstart5 kwrite "$LOGFILE" &
+  fi
 }
 
 # Main

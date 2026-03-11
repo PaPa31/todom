@@ -21,6 +21,24 @@ sync_project() {
   echo "$1. " "$project_folder" >> "$LOGFILE"
   NOTIFY+="$1.$project_folder\n"
 
+  # Identify the remote name (usually "origin")
+  local remote_name=$(git remote | head -n 1)
+
+  # 1. PULL FIRST (The Gold Standard)
+  # This uses your new config: auto-stashing local changes and rebasing
+  echo "Pulling latest changes from truth..." >> "$LOGFILE"
+  git pull "$remote_name" master >> "$LOGFILE" 2>&1
+
+  # Check if the pull was successful, and if not, log an error message
+  if [[ $? -ne 0 ]]; then
+    echo "  Failed to pull! Conflict might need manual resolution." >> "$LOGFILE"
+    echo >> "$LOGFILE"
+    NOTIFY+="  Pull Error (Conflict?)\n"
+    success=false
+    return 1
+  fi
+
+  # 2. COMMIT LOCAL CHANGES
   # Check if there are any changes in the working directory
   if [[ -n $(git status --short) ]]; then
     # Stage all changes, including file renames
@@ -48,15 +66,14 @@ sync_project() {
     local changes_pushed=true
 
   else
-    echo "  No changes in repository" >> "$LOGFILE"
+    echo "  No local changes to commit" >> "$LOGFILE"
     changes_pushed=false
   fi
 
-  # Identify the remote name (usually "origin")
-  local remote_name=$(git remote | head -n 1)
-
+  # 3. PUSH
+  # Now that we are rebased and up-to-date, push will succeed
   # Push any unpushed commits, even if the working directory is clean
-  echo "Pushing changes:" >> "$LOGFILE"
+  echo "Pushing to remote..." >> "$LOGFILE"
   git push "$remote_name" master >> "$LOGFILE" 2>&1
 
   # Check if the push was successful, and if not, log an error message
@@ -71,21 +88,8 @@ sync_project() {
   if [[ $changes_pushed == false ]]; then
     NOTIFY+="  Everything up-to-date.\n"
   else
-    echo "  Changes pushed successfully!" >> "$LOGFILE"
-    NOTIFY+="  Changes pushed successfully!\n"
-  fi
-
-  # Perform git pull to merge remote changes
-  echo "Pulling changes:" >> "$LOGFILE"
-  git pull "$remote_name" master >> "$LOGFILE" 2>&1
-
-  # Check if the pull was successful, and if not, log an error message
-  if [[ $? -ne 0 ]]; then
-    echo "  Failed to pull!" >> "$LOGFILE"
-    echo >> "$LOGFILE"
-    NOTIFY+="  Failed to pull\n\n"
-    success=false
-    return 1
+    echo "  Changes synced & pushed!" >> "$LOGFILE"
+    NOTIFY+="  Changes synced & pushed!\n"
   fi
 
   echo >> "$LOGFILE"

@@ -27,7 +27,18 @@ sync_project() {
   # 1. PULL FIRST (The Gold Standard)
   # This uses your new config: auto-stashing local changes and rebasing
   echo "Pulling latest changes from truth..." >> "$LOGFILE"
-  git pull "$remote_name" master >> "$LOGFILE" 2>&1
+  if ! git pull "$remote_name" master >> "$LOGFILE" 2>&1; then
+    echo "  CONFLICT DETECTED! Manual resolution required." >> "$LOGFILE"
+    NOTIFY+="  ⚠️ CONFLICT! Please resolve manually.\n"
+
+    # POP-UP ALERT: Open Konsole in the project folder so you can fix it
+    if command -v konsole &>/dev/null; then
+       konsole --workdir "$project_folder" -e bash -c "echo 'GIT CONFLICT IN $project_folder'; echo 'Resolve changes, then exit this terminal to continue sync.'; bash" &
+    fi
+
+    success=false
+    return 1
+  fi
 
   # Check if the pull was successful, and if not, log an error message
   if [[ $? -ne 0 ]]; then

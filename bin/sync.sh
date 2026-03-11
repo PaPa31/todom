@@ -60,34 +60,29 @@ sync_project() {
 send_notification() {
   local title="✅ Sync Successful"
   local message="Summary:\n$NOTIFY"
+  local action ret
 
   if [[ "$success" == "false" ]]; then
     title="❌ Sync FAILED!"
-    # Show Zenity box
-    local action=$(zenity --question --title="$title" --text="$message" \
+    action=$(zenity --question --title="$title" --text="$message" \
            --ok-label="💻 Fix in Terminal" \
            --extra-button="📄 Open Log" \
            --cancel-label="Close" \
            --timeout=10)
-    local ret=$?
+    ret=$?
   else
-    local action=$(zenity --question --title="$title" --text="$message" \
+    action=$(zenity --question --title="$title" --text="$message" \
            --ok-label="📄 Open Log" \
            --cancel-label="Close" \
            --timeout=10)
-    local ret=$?
+    ret=$?
   fi
 
-  echo "DEBUG: Zenity return: '$ret' Action: '$action'" >> "$LOGFILE"
-
-  # Handle the click (Case 0: OK button, Case "📄 Open Log": Extra button)
   case "$ret" in
     0)
       if [[ "$success" == "false" ]]; then
-        # Launching Konsole in a subshell and detaching
         (konsole --workdir "$FAILED_DIR" &) &
       else
-        # Launching KWrite in a subshell and detaching
         (kwrite "$LOGFILE" &) &
       fi
       ;;
@@ -96,7 +91,6 @@ send_notification() {
       ;;
   esac
 
-  # This makes the script exit immediately instead of waiting for child processes
   exit 0
 }
 

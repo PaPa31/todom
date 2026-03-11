@@ -60,54 +60,45 @@ sync_project() {
 send_notification() {
   local title="✅ Sync Successful"
   local message="Summary:\n$NOTIFY"
-  local status_icon="info"
 
-  if [[ $success == false ]]; then
+  if [[ "$success" == "false" ]]; then
     title="❌ Sync FAILED!"
-    status_icon="error"
-    # Zenity Question box: OK = Fix, Extra = Log
-    zenity --question --title="$title" --text="$message" \
+    # Show Zenity box
+    local action=$(zenity --question --title="$title" --text="$message" \
            --ok-label="💻 Fix in Terminal" \
            --extra-button="📄 Open Log" \
            --cancel-label="Close" \
-           --icon-name="$status_icon" \
-           --timeout=10
-    local action=$?
+           --timeout=10)
+    local ret=$?
   else
-    # Success box: OK = Open Log, Cancel = Close
-    zenity --question --title="$title" --text="$message" \
+    local action=$(zenity --question --title="$title" --text="$message" \
            --ok-label="📄 Open Log" \
            --cancel-label="Close" \
-           --icon-name="$status_icon" \
-           --timeout=10
-    local action=$?
+           --timeout=10)
+    local ret=$?
   fi
 
-  echo "DEBUG: Zenity action code: '$action'" >> "$LOGFILE"
+  echo "DEBUG: Zenity return: '$ret' Action: '$action'" >> "$LOGFILE"
 
-  # Zenity Exit Codes:
-  # 0 = OK (Fix or Log)
-  # 1 = Cancel/Close
-  # 5 = Extra Button (Open Log in Failed mode)
-  # 100 or -1 = Timeout
-
-  case "$action" in
+  # Handle the click (Case 0: OK button, Case "📄 Open Log": Extra button)
+  case "$ret" in
     0)
-      if [[ $success == false ]]; then
-        kstart5 konsole --workdir "$FAILED_DIR" &
+      if [[ "$success" == "false" ]]; then
+        # Launching Konsole in a subshell and detaching
+        (konsole --workdir "$FAILED_DIR" &) &
       else
-        kstart5 kwrite "$LOGFILE" &
+        # Launching KWrite in a subshell and detaching
+        (kwrite "$LOGFILE" &) &
       fi
       ;;
-    "📄 Open Log") # Zenity returns the label string for extra buttons
-      kstart5 kwrite "$LOGFILE" &
-      ;;
-    5) # Some versions return 5 for the extra button
-      kstart5 kwrite "$LOGFILE" &
+    5)
+      (kwrite "$LOGFILE" &) &
       ;;
   esac
-}
 
+  # This makes the script exit immediately instead of waiting for child processes
+  exit 0
+}
 
 # Main
 sleep 10

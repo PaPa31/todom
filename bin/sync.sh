@@ -69,14 +69,22 @@ send_notification() {
   fi
   args+=(--action="log:📄 Open Log")
 
-  # Capture the action from notify-send
-  # On KDE/MX, this waits for the user to click or the notification to expire
+  # Capture the action
   local action=$(notify-send "$title" "$NOTIFY" --icon="$icon" "${args[@]}")
 
   case "$action" in
-    "fix") konsole --workdir "$FAILED_DIR" & ;;
-    "log") kwrite "$LOGFILE" & ;; # Explicitly using KWrite for KDE
+    "fix")
+      # Use nohup and redirect all output to /dev/null to fully detach
+      nohup konsole --workdir "$FAILED_DIR" >/dev/null 2>&1 &
+      ;;
+    "log")
+      # Fully detaching KWrite so it survives the script exit
+      nohup kwrite "$LOGFILE" >/dev/null 2>&1 &
+      ;;
   esac
+
+  # Give the system a split second to spawn the process before the script dies
+  sleep 0.2
 }
 
 # Main

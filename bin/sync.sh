@@ -58,46 +58,56 @@ sync_project() {
 }
 
 send_notification() {
-  local title="Sync Status"
+  local title="✅ Sync Successful"
   local message="Summary:\n$NOTIFY"
-  local cmd_args=()
+  local status_icon="info"
 
   if [[ $success == false ]]; then
     title="❌ Sync FAILED!"
-    # kdialog --yesnocancel: Yes=Fix, No=Log, Cancel=Exit
-    kdialog --title "$title" --yesnocancel "$message" \
-            --yes-label "💻 Fix in Terminal" \
-            --no-label "📄 Open Log" \
-            --cancel-label "Close" \
-            --icon error \
-            --timeout 10
+    status_icon="error"
+    # Zenity Question box: OK = Fix, Extra = Log
+    zenity --question --title="$title" --text="$message" \
+           --ok-label="💻 Fix in Terminal" \
+           --extra-button="📄 Open Log" \
+           --cancel-label="Close" \
+           --icon-name="$status_icon" \
+           --timeout=10
     local action=$?
   else
-    title="✅ Sync Successful"
-    # kdialog --yesno: Yes=Log, No=Close
-    kdialog --title "$title" --yesno "$message" \
-            --yes-label "📄 Open Log" \
-            --no-label "Close" \
-            --icon emblem-success \
-            --timeout 10
+    # Success box: OK = Open Log, Cancel = Close
+    zenity --question --title="$title" --text="$message" \
+           --ok-label="📄 Open Log" \
+           --cancel-label="Close" \
+           --icon-name="$status_icon" \
+           --timeout=10
     local action=$?
   fi
 
-  # KDialog Exit Codes:
-  # 0 = Yes (Fix or Log depending on context)
-  # 1 = No (Log or Close)
-  # 2 = Cancel
-  # 255 = Timeout
+  echo "DEBUG: Zenity action code: '$action'" >> "$LOGFILE"
 
-  echo "DEBUG: KDialog action code: '$action'" >> "$LOGFILE"
+  # Zenity Exit Codes:
+  # 0 = OK (Fix or Log)
+  # 1 = Cancel/Close
+  # 5 = Extra Button (Open Log in Failed mode)
+  # 100 or -1 = Timeout
 
-  if [[ $success == false ]]; then
-    [[ $action -eq 0 ]] && kstart5 konsole --workdir "$FAILED_DIR" &
-    [[ $action -eq 1 ]] && kstart5 kwrite "$LOGFILE" &
-  else
-    [[ $action -eq 0 ]] && kstart5 kwrite "$LOGFILE" &
-  fi
+  case "$action" in
+    0)
+      if [[ $success == false ]]; then
+        kstart5 konsole --workdir "$FAILED_DIR" &
+      else
+        kstart5 kwrite "$LOGFILE" &
+      fi
+      ;;
+    "📄 Open Log") # Zenity returns the label string for extra buttons
+      kstart5 kwrite "$LOGFILE" &
+      ;;
+    5) # Some versions return 5 for the extra button
+      kstart5 kwrite "$LOGFILE" &
+      ;;
+  esac
 }
+
 
 # Main
 sleep 10

@@ -111,23 +111,38 @@ sync_project() {
 
 # Function to display enhanced notification after synchronization
 send_notification() {
-  local sync_summary=""
-  local repositories_with_changes=()
+  local sync_summary="Sync Summary"
+  local action=""
 
   if [[ $success == false ]]; then
-    NOTIFICATION_TITLE="Sync Failed!!!"
-    sync_summary="  See ~/logfile.log"
-  fi
-
-  local message="$sync_summary\n\n$NOTIFY"
-
-  if command -v notify-send &>/dev/null; then
-    notify-send "$NOTIFICATION_TITLE" "$message" -i emblem-default
-  elif command -v zenity &>/dev/null; then
-    zenity --info --title="$NOTIFICATION_TITLE" --text="$message"
+    NOTIFICATION_TITLE="❌ Sync FAILED!"
+    #sync_summary="  See ~/logfile.log"
+    sync_summary="Errors detected in repositories."
+    # Use notify-send with an action (Button 1: Fix, Button 2: Log)
+    action=$(notify-send "$NOTIFICATION_TITLE" "$sync_summary\n$NOTIFY" \
+      --icon=error \
+      --action="fix:💻 Fix in Terminal" \
+      --action="log:📄 Open Log")
   else
-    echo "Notification: $NOTIFICATION_TITLE\n\n$message"
+    NOTIFICATION_TITLE="✅ Sync Successful"
+    sync_summary="All repos are up-to-date."
+    # Button for success: Just Open Log
+    action=$(notify-send "$NOTIFICATION_TITLE" "$sync_summary\n$NOTIFY" \
+      --icon=emblem-success \
+      --action="log:📄 Open Log")
   fi
+
+    # Handle the click action
+  case "$action" in
+    "fix")
+      # Open Konsole in the first project folder that likely caused the error
+      konsole --workdir "${PROJECT_FOLDERS[0]}" &
+      ;;
+    "log")
+      # Open the logfile with your default KDE editor (usually KWrite or Kate)
+      xdg-open "$LOGFILE" &
+      ;;
+  esac
 }
 
 # Main script

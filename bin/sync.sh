@@ -72,7 +72,9 @@ send_notification() {
 
   # Capture the action by telling notify-send to WAIT for the user or timeout
   echo "DEBUG: Waiting for notification click (with --wait flag)..." >> "$LOGFILE"
-  action=$(notify-send "$title" "$NOTIFY" --icon="$icon" "${args[@]}" --wait)
+#   action=$(notify-send "$title" "$NOTIFY" --icon="$icon" "${args[@]}" --wait)
+  action=$(notify-send "$title" "$NOTIFY" --icon="$icon" "${args[@]}" -p)
+
   echo "DEBUG: Notification action captured: '$action'" >> "$LOGFILE"
 
 

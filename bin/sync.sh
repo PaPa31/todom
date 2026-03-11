@@ -58,33 +58,41 @@ sync_project() {
 }
 
 send_notification() {
-  local title="✅ Sync Successful"
-  local icon="emblem-success"
-  local args=()
+  local title icon args action
 
   if [[ $success == false ]]; then
     title="❌ Sync FAILED!"
     icon="error"
-    args+=(--action="fix:💻 Fix in Terminal")
+    args=(--action="fix:💻 Fix in Terminal")
+  else
+    title="✅ Sync Successful"
+    icon="emblem-success"
   fi
   args+=(--action="log:📄 Open Log")
 
-  # Capture the action
-  local action=$(notify-send "$title" "$NOTIFY" --icon="$icon" "${args[@]}")
+  # Capture the action and log it for debugging
+  echo "DEBUG: Waiting for notification click..." >> "$LOGFILE"
+  action=$(notify-send "$title" "$NOTIFY" --icon="$icon" "${args[@]}")
+  echo "DEBUG: Notification action captured: '$action'" >> "$LOGFILE"
 
   case "$action" in
     "fix")
-      # Use nohup and redirect all output to /dev/null to fully detach
-      nohup konsole --workdir "$FAILED_DIR" >/dev/null 2>&1 &
+      echo "DEBUG: Attempting to launch Konsole in $FAILED_DIR" >> "$LOGFILE"
+      # kstart5 is the KDE way to launch detached GUI apps
+      kstart5 konsole --workdir "$FAILED_DIR" >/dev/null 2>&1 &
       ;;
     "log")
-      # Fully detaching KWrite so it survives the script exit
-      nohup kwrite "$LOGFILE" >/dev/null 2>&1 &
+      echo "DEBUG: Attempting to launch KWrite for $LOGFILE" >> "$LOGFILE"
+      # setsid runs the program in a new session entirely
+      setsid kwrite "$LOGFILE" >/dev/null 2>&1 &
+      ;;
+    *)
+      echo "DEBUG: No action or notification timed out." >> "$LOGFILE"
       ;;
   esac
 
-  # Give the system a split second to spawn the process before the script dies
-  sleep 0.2
+  # Ensure the background process detaches
+  disown -a
 }
 
 # Main

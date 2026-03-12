@@ -61,50 +61,40 @@ send_notification() {
   local title="✅ Sync Successful"
   local message="Summary:\n$NOTIFY"
   local ret
-  local timeout_val="--timeout=10"
 
   if [[ "$success" == "false" ]]; then
     title="❌ Sync FAILED!"
-    # No timeout for failures
-    ret=$(zenity --question --title="$title" --text="$message" \
+    # No timeout for failure
+    zenity --question --title="$title" --text="$message" \
            --ok-label="💻 Fix in Terminal" \
            --extra-button="📄 Open Log" \
-           --cancel-label="Close")
+           --cancel-label="Close"
     ret=$?
+
+    echo "DEBUG: FAILURE MODE - Zenity return code: '$ret'" >> "$LOGFILE"
+
+    case "$ret" in
+      0) (konsole --workdir "$FAILED_DIR" &) & ;; # Clicked Fix
+      5) (kwrite "$LOGFILE" &) & ;;               # Clicked Log
+      *) echo "DEBUG: Failure box closed or ignored." >> "$LOGFILE" ;;
+    esac
+
   else
-    # 10s timeout for success
-    ret=$(zenity --question --title="$title" --text="$message" \
+    # SUCCESS MODE
+    zenity --question --title="$title" --text="$message" \
            --ok-label="📄 Open Log" \
            --cancel-label="Close" \
-           --timeout=10)
+           --timeout=10
     ret=$?
+
+    echo "DEBUG: SUCCESS MODE - Zenity return code: '$ret'" >> "$LOGFILE"
+
+    case "$ret" in
+      0) (kwrite "$LOGFILE" &) & ;; # Only open if you actually CLICKED the button
+      5) echo "DEBUG: Timeout detected (Code 5). Exiting quietly..." >> "$LOGFILE" ;;
+      *) echo "DEBUG: Success box closed or ignored." >> "$LOGFILE" ;;
+    esac
   fi
-
-  echo "DEBUG: Zenity return code: '$ret'" >> "$LOGFILE"
-
-  # Exit Codes:
-  # 0   = OK/Label Button
-  # 1   = Cancel/Close
-  # 5   = Extra Button (Open Log in Failure mode)
-  # 100 = TIMEOUT (Do nothing!)
-
-  case "$ret" in
-    0)
-      if [[ "$success" == "false" ]]; then
-        (konsole --workdir "$FAILED_DIR" &) &
-      else
-        # SUCCESS + OK CLICK = Open Log
-        (kwrite "$LOGFILE" &) &
-      fi
-      ;;
-    5)
-      # FAILURE + EXTRA CLICK = Open Log
-      (kwrite "$LOGFILE" &) &
-      ;;
-    100)
-      echo "DEBUG: Notification timed out. Closing quietly." >> "$LOGFILE"
-      ;;
-  esac
 
   exit 0
 }

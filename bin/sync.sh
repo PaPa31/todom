@@ -95,8 +95,16 @@ send_notification() {
 }
 
 # Main
-sleep 10
-> "$LOGFILE"
+> "$LOGFILE"  # Reset log first so we see network debugs
+sleep 20      # Give Rig #2 USB bus more time
+
+if ! ping -c 1 8.8.8.8 &>/dev/null; then
+  echo "Network down! Attempting restart..." >> "$LOGFILE"
+  # Try nmcli first, if that fails, the visudo edit above will fix the sudo call
+  nmcli networking off && nmcli networking on || sudo service network-manager restart
+  sleep 10
+fi
+
 sync_project "1" "${PROJECT_FOLDERS[0]}"
 sync_project "2" "${PROJECT_FOLDERS[1]}"
 send_notification

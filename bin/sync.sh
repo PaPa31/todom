@@ -60,45 +60,49 @@ sync_project() {
 send_notification() {
   local title="✅ Sync Successful"
   local message="Summary:\n$NOTIFY"
-  local action ret
+  local ret
   local timeout_val="--timeout=10"
 
   if [[ "$success" == "false" ]]; then
     title="❌ Sync FAILED!"
-    # Remove timeout for Failure State so it waits for YOU
-    timeout_val=""
-
-    action=$(zenity --question --title="$title" --text="$message" \
+    # No timeout for failures
+    ret=$(zenity --question --title="$title" --text="$message" \
            --ok-label="💻 Fix in Terminal" \
            --extra-button="📄 Open Log" \
-           --cancel-label="Close" \
-           $timeout_val)
+           --cancel-label="Close")
     ret=$?
   else
-    # Keep 10s timeout for Success State
-    action=$(zenity --question --title="$title" --text="$message" \
+    # 10s timeout for success
+    ret=$(zenity --question --title="$title" --text="$message" \
            --ok-label="📄 Open Log" \
            --cancel-label="Close" \
-           $timeout_val)
+           --timeout=10)
     ret=$?
   fi
 
-  echo "DEBUG: Zenity return: '$ret' Action: '$action'" >> "$LOGFILE"
+  echo "DEBUG: Zenity return code: '$ret'" >> "$LOGFILE"
 
-  # The logic fix: Only launch if the specific button was pressed
+  # Exit Codes:
+  # 0   = OK/Label Button
+  # 1   = Cancel/Close
+  # 5   = Extra Button (Open Log in Failure mode)
+  # 100 = TIMEOUT (Do nothing!)
+
   case "$ret" in
     0)
       if [[ "$success" == "false" ]]; then
-        # On Failure, OK button = Fix in Terminal
         (konsole --workdir "$FAILED_DIR" &) &
       else
-        # On Success, OK button = Open Log
+        # SUCCESS + OK CLICK = Open Log
         (kwrite "$LOGFILE" &) &
       fi
       ;;
     5)
-      # Extra button (only exists in Failure mode) = Open Log
+      # FAILURE + EXTRA CLICK = Open Log
       (kwrite "$LOGFILE" &) &
+      ;;
+    100)
+      echo "DEBUG: Notification timed out. Closing quietly." >> "$LOGFILE"
       ;;
   esac
 
